@@ -81,8 +81,8 @@
 			<p class="text-red-500">{error.message}</p>
 		{/await}
 	{:else}
-		<div class="w-full h-full flex justify-center items-center">
-			<p>No meeting loaded...</p>
+		<div class="w-full h-full flex justify-center items-center text-center">
+			<p>No meeting loaded. <br /> Enter a When2meet link above.</p>
 		</div>
 	{/if}
 </div>
