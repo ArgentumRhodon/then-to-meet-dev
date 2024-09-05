@@ -7,7 +7,7 @@
 
 	const infoScriptNum = 9;
 	let w2mMeetingPromise;
-	let w2mLink = '';
+	let w2mLink = 'https://www.when2meet.com/?25478485-BiFSz';
 
 	const loadMeeting = async (meetingLink) => {
 		if (w2mLink) {
@@ -49,14 +49,48 @@
 	>
 </form>
 
-<div class="h-[calc(100vh-214px)] md:h-[calc(100vh-116px)] md:flex justify-center items-center">
+<div
+	class="flex justify-center items-center min-h-[calc(100vh-214px)] md:min-h-[calc(100vh-116px)]"
+>
+	{#if w2mMeetingPromise}
+		{#await w2mMeetingPromise}
+			<ProgressRadial width="w-24" />
+		{:then res}
+			<div class="md:container card p-4">
+				<form action="">
+					<label for="" class="label">
+						<span>Select group</span>
+						<ul>
+							{#each $people as person}
+								<li>
+									<label for="">
+										<input type="checkbox" class="checkbox scale-125" />
+										<span>{person.name}</span>
+									</label>
+								</li>
+							{/each}
+						</ul>
+					</label>
+					<button class="btn variant-filled-primary">Find Times</button>
+				</form>
+			</div>
+		{:catch err}
+			<p>{err.message}</p>
+		{/await}
+	{:else}
+		<p>No meeting loaded...</p>
+	{/if}
+</div>
+
+<!-- 
+<div class="h-[calc(100vh-214px)] md:h-[calc(100vh-116px)] p-4 flex justify-center">
 	{#if w2mMeetingPromise}
 		{#await w2mMeetingPromise}
 			<div class="w-full h-full flex justify-center items-center">
 				<ProgressRadial width="w-24" />
 			</div>
 		{:then res}
-			<div class="container card p-4 flex flex-col md:flex-row gap-8">
+			<div class="md:container card p-4 flex flex-col md:flex-row gap-8 h-screen">
 				<div>
 					<h2 class="text-xl font-bold mb-4">Select group:</h2>
 					<form action="">
@@ -74,7 +108,7 @@
 					</form>
 				</div>
 				<span class="hidden md:block divider-vertical" />
-				<hr />
+				<hr class="md:hidden" />
 				<div class="flex-grow"></div>
 			</div>
 		{:catch error}
@@ -85,4 +119,4 @@
 			<p>No meeting loaded. <br /> Enter a When2meet link or ID above.</p>
 		</div>
 	{/if}
-</div>
+</div> -->
