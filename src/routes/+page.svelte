@@ -82,7 +82,7 @@
 		{/await}
 	{:else}
 		<div class="w-full h-full flex justify-center items-center text-center">
-			<p>No meeting loaded. <br /> Enter a When2meet link above.</p>
+			<p>No meeting loaded. <br /> Enter a When2meet link or ID above.</p>
 		</div>
 	{/if}
 </div>
