@@ -50,73 +50,38 @@
 </form>
 
 <div
-	class="flex justify-center items-center min-h-[calc(100vh-214px)] md:min-h-[calc(100vh-116px)]"
+	class="md:flex justify-center items-center min-h-[calc(100vh-214px)] md:min-h-[calc(100vh-116px)]"
 >
 	{#if w2mMeetingPromise}
 		{#await w2mMeetingPromise}
-			<ProgressRadial width="w-24" />
+			<div class="w-full h-96 flex justify-center items-center">
+				<ProgressRadial width="w-24" />
+			</div>
 		{:then res}
-			<div class="md:container card p-4">
+			<div class="w-full md:container card p-4 flex">
 				<form action="">
-					<label for="" class="label">
-						<span>Select group</span>
-						<ul>
-							{#each $people as person}
-								<li>
-									<label for="">
-										<input type="checkbox" class="checkbox scale-125" />
-										<span>{person.name}</span>
-									</label>
-								</li>
-							{/each}
-						</ul>
-					</label>
+					<span>Select group</span>
+					<ul>
+						{#each $people as person}
+							<li>
+								<label for="member">
+									<input name="member" type="checkbox" class="checkbox scale-125" />
+									<span>{person.name}</span>
+								</label>
+							</li>
+						{/each}
+					</ul>
 					<button class="btn variant-filled-primary">Find Times</button>
 				</form>
 			</div>
 		{:catch err}
-			<p>{err.message}</p>
+			<div class="w-full h-96 flex justify-center items-center">
+				<p>{err.message}</p>
+			</div>
 		{/await}
 	{:else}
-		<p>No meeting loaded...</p>
-	{/if}
-</div>
-
-<!-- 
-<div class="h-[calc(100vh-214px)] md:h-[calc(100vh-116px)] p-4 flex justify-center">
-	{#if w2mMeetingPromise}
-		{#await w2mMeetingPromise}
-			<div class="w-full h-full flex justify-center items-center">
-				<ProgressRadial width="w-24" />
-			</div>
-		{:then res}
-			<div class="md:container card p-4 flex flex-col md:flex-row gap-8 h-screen">
-				<div>
-					<h2 class="text-xl font-bold mb-4">Select group:</h2>
-					<form action="">
-						<ul class="space-y-4">
-							{#each $people as person}
-								<li>
-									<label class="flex items-center space-x-2">
-										<input type="checkbox" class="checkbox scale-125" />
-										<p class="text-lg">{person.name}</p>
-									</label>
-								</li>
-							{/each}
-						</ul>
-						<button type="submit" class="btn variant-filled-primary mt-4">Find Overlap</button>
-					</form>
-				</div>
-				<span class="hidden md:block divider-vertical" />
-				<hr class="md:hidden" />
-				<div class="flex-grow"></div>
-			</div>
-		{:catch error}
-			<p class="text-red-500">{error.message}</p>
-		{/await}
-	{:else}
-		<div class="w-full h-full flex justify-center items-center text-center">
-			<p>No meeting loaded. <br /> Enter a When2meet link or ID above.</p>
+		<div class="w-full h-96 flex justify-center items-center">
+			<p>No meeting loaded...</p>
 		</div>
 	{/if}
-</div> -->
+</div>
