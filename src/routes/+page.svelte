@@ -1,6 +1,6 @@
 <script>
 	import { people, slots, getPeopleData, getSlotData } from '$lib';
-	import { ProgressRadial, TabGroup } from '@skeletonlabs/skeleton';
+	import { ProgressRadial, setInitialClassState, TabGroup } from '@skeletonlabs/skeleton';
 	import { DateTime } from 'luxon';
 
 	/** @type {import('./$types').PageData} */
@@ -9,7 +9,7 @@
 	const infoScriptNum = 9;
 	let groupedSlots = {};
 	let days = [];
-	let selectedIDs = [];
+	let selectedIDs = new Set();
 	let w2mMeetingPromise;
 	let w2mLink = 'https://www.when2meet.com/?25478485-BiFSz';
 
@@ -18,13 +18,20 @@
 	const formatDate = (unixTime) => {
 		const date = DateTime.fromSeconds(unixTime);
 		return date.year <= 1978
-			? date.toFormat('cccc') // Full weekday name (e.g., "Monday")
+			? date.toFormat('EEE') // Full weekday name (e.g., "Monday")
 			: date.toFormat('EEE, MMM dd'); // Short weekday, month, and day (e.g., "Mon, Sep 06")
 	};
 
 	const formatTime = (unixTime) => {
 		const time = DateTime.fromSeconds(unixTime);
-		return time.year <= 1978 ? time.toUTC().toFormat('hh:mm a') : time.toFormat('hh:mm a');
+		return time.year <= 1978
+			? time.toUTC().toFormat('hh:mm a').replace(/\s/g, '')
+			: time.toFormat('hh:mm a').replace(/\s/g, '');
+	};
+
+	const togglePerson = (id) => {
+		selectedIDs.has(id) ? selectedIDs.delete(id) : selectedIDs.add(id);
+		selectedIDs = new Set(selectedIDs);
 	};
 
 	const loadMeeting = async (meetingLink) => {
@@ -55,6 +62,8 @@
 			});
 		}
 	};
+
+	let hi = true;
 </script>
 
 <form
@@ -89,19 +98,24 @@
 			</div>
 		{:then res}
 			<div class="w-full md:container card p-4 flex flex-col md:flex-row">
-				<form action="" class="space-y-4">
+				<div action="" class="space-y-4">
 					<span class="text-xl">Select group</span>
 					<ul class="space-y-2">
 						{#each $people as person}
 							<li>
 								<label for="member" class="space-x-2">
-									<input name="member" type="checkbox" class="checkbox scale-125" />
-									<span class="text-lg">{person.name}</span>
+									<!-- <input name="member" type="checkbox" class="checkbox scale-125" /> -->
+									<button
+										class="btn variant-soft-surface text-lg w-full"
+										class:!variant-filled-primary={selectedIDs.has(person.id)}
+										on:click={() => togglePerson(person.id)}>{person.name}</button
+									>
+									<!-- <span class="text-lg">{person.name}</span> -->
 								</label>
 							</li>
 						{/each}
 					</ul>
-				</form>
+				</div>
 				<span class="divider-vertical hidden md:block mx-8"></span>
 				<hr class="md:hidden my-8" />
 				<div class="flex-grow overflow-scroll">
@@ -115,7 +129,7 @@
 							{#each { length: groupedSlots[days[0]].length } as _, rowIndex}
 								<tr>
 									{#each days as day}
-										<td class="border text-center">
+										<td class="border text-center opacity-75 text-sm p-[5px]">
 											{formatTime(groupedSlots[day][rowIndex].time)}
 										</td>
 									{/each}
