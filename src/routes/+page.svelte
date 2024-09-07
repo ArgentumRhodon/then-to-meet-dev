@@ -115,6 +115,13 @@
 							</li>
 						{/each}
 					</ul>
+					<button
+						class="btn variant-filled-warning w-full"
+						on:click={() => (selectedIDs = new Set())}
+						disabled={selectedIDs.size === 0}
+					>
+						Clear group
+					</button>
 				</div>
 				<span class="divider-vertical hidden md:block mx-8"></span>
 				<hr class="md:hidden my-8" />
@@ -129,7 +136,13 @@
 							{#each { length: groupedSlots[days[0]].length } as _, rowIndex}
 								<tr>
 									{#each days as day}
-										<td class="border text-center opacity-75 text-sm p-[5px]">
+										<td
+											class="border text-center opacity-75 text-sm p-[5px]"
+											class:bg-green-700={selectedIDs.size > 0 &&
+												[...selectedIDs].every((id) =>
+													groupedSlots[day][rowIndex].available.includes(id)
+												)}
+										>
 											{formatTime(groupedSlots[day][rowIndex].time)}
 										</td>
 									{/each}
