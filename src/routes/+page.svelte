@@ -1,13 +1,31 @@
 <script>
 	import { people, slots, getPeopleData, getSlotData } from '$lib';
-	import { ProgressRadial } from '@skeletonlabs/skeleton';
+	import { ProgressRadial, TabGroup } from '@skeletonlabs/skeleton';
+	import { DateTime } from 'luxon';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 
 	const infoScriptNum = 9;
+	let groupedSlots = {};
+	let days = [];
+	let selectedIDs = [];
 	let w2mMeetingPromise;
 	let w2mLink = 'https://www.when2meet.com/?25478485-BiFSz';
+
+	$: console.log(selectedIDs);
+
+	const formatDate = (unixTime) => {
+		const date = DateTime.fromSeconds(unixTime);
+		return date.year <= 1978
+			? date.toFormat('cccc') // Full weekday name (e.g., "Monday")
+			: date.toFormat('EEE, MMM dd'); // Short weekday, month, and day (e.g., "Mon, Sep 06")
+	};
+
+	const formatTime = (unixTime) => {
+		const time = DateTime.fromSeconds(unixTime);
+		return time.year <= 1978 ? time.toUTC().toFormat('hh:mm a') : time.toFormat('hh:mm a');
+	};
 
 	const loadMeeting = async (meetingLink) => {
 		if (w2mLink) {
@@ -23,6 +41,18 @@
 
 			$slots = getSlotData(scriptContent);
 			$people = getPeopleData(scriptContent, $slots);
+
+			// Groups the slot data provided in $slots under specific days/dates
+			groupedSlots = {};
+			days = [];
+			$slots.forEach((slot) => {
+				const day = formatDate(slot.time);
+				if (!groupedSlots[day]) {
+					groupedSlots[day] = [];
+					days.push(day);
+				}
+				groupedSlots[day].push(slot);
+			});
 		}
 	};
 </script>
@@ -58,21 +88,42 @@
 				<ProgressRadial width="w-24" />
 			</div>
 		{:then res}
-			<div class="w-full md:container card p-4 flex">
-				<form action="">
-					<span>Select group</span>
-					<ul>
+			<div class="w-full md:container card p-4 flex flex-col md:flex-row">
+				<form action="" class="space-y-4">
+					<span class="text-xl">Select group</span>
+					<ul class="space-y-2">
 						{#each $people as person}
 							<li>
-								<label for="member">
+								<label for="member" class="space-x-2">
 									<input name="member" type="checkbox" class="checkbox scale-125" />
-									<span>{person.name}</span>
+									<span class="text-lg">{person.name}</span>
 								</label>
 							</li>
 						{/each}
 					</ul>
-					<button class="btn variant-filled-primary">Find Times</button>
 				</form>
+				<span class="divider-vertical hidden md:block mx-8"></span>
+				<hr class="md:hidden my-8" />
+				<div class="flex-grow overflow-scroll">
+					<table class="table-auto w-full border-collapse">
+						<thead>
+							{#each days as day}
+								<th class="border px-4 py-2">{day}</th>
+							{/each}
+						</thead>
+						<tbody>
+							{#each { length: groupedSlots[days[0]].length } as _, rowIndex}
+								<tr>
+									{#each days as day}
+										<td class="border text-center">
+											{formatTime(groupedSlots[day][rowIndex].time)}
+										</td>
+									{/each}
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		{:catch err}
 			<div class="w-full h-96 flex justify-center items-center">
